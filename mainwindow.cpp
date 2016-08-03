@@ -41,13 +41,13 @@ MainWindow::MainWindow(QWidget *parent) :
     mediaRecorder = new QMediaRecorder(camera,this);
 
     QVideoEncoderSettings videoSettings = mediaRecorder->videoSettings();
-    videoSettings.setResolution(640, 480);
-    videoSettings.setQuality(QMultimedia::VeryHighQuality);
+    // videoSettings.setResolution(640, 480);
+    // videoSettings.setQuality(QMultimedia::VeryHighQuality);
     mediaRecorder->setVideoSettings(videoSettings);
 
-    QAudioEncoderSettings audioSettings;
-    audioSettings.setCodec("audio/mp3");
-    audioSettings.setQuality(QMultimedia::HighQuality);
+    QAudioEncoderSettings audioSettings = mediaRecorder->audioSettings();
+    // audioSettings.setCodec("audio/mp3");
+    // audioSettings.setQuality(QMultimedia::HighQuality);
 
     mediaRecorder->setAudioSettings(audioSettings);
 
@@ -66,14 +66,14 @@ void MainWindow::recordButton_toggled(bool checked)
 {
     if ( checked ) {
         ui->stackedWidget->setCurrentIndex(cameraFinderPos);
-        QString name = QString("xxx") + QDateTime::currentDateTime().toString("dd.MM.yy-h-m-s");
-        qDebug() << qApp->applicationDirPath();
-        qDebug() << name;
-
-        mediaRecorder->setOutputLocation(QUrl::fromLocalFile(qApp->applicationDirPath() + "/" + name + ".mp4"));
+        QString fileName = QString("C:/dev/xxx-") + QDateTime::currentDateTime().toString("dd.MM.yy-h-m-s") + ".avi";
+        qDebug() << QUrl::fromLocalFile(fileName);
+        mediaRecorder->setOutputLocation(fileName);
         mediaRecorder->record();
+        ui->recordButton->setText(QString("Recording is ON"));
     } else {
         ui->stackedWidget->setCurrentIndex(cameraFinderPos);
         mediaRecorder->stop();
+        ui->recordButton->setText(QString("Recording is Off"));
     }
 }
