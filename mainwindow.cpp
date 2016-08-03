@@ -8,6 +8,7 @@
 #include <QMediaRecorder>
 #include <QCameraInfo>
 #include <QDateTime>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -45,6 +46,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // videoSettings.setQuality(QMultimedia::VeryHighQuality);
     mediaRecorder->setVideoSettings(videoSettings);
 
+    qDebug() << "Codec: " + videoSettings.codec();
+    qDebug() << "bitRate: " + QString( videoSettings.bitRate() );
+    qDebug() << "encodingMode: " + QString( videoSettings.encodingMode() );
+    // qDebug() << "encodingOptions: " + videoSettings.encodingOptions();
+
     QAudioEncoderSettings audioSettings = mediaRecorder->audioSettings();
     // audioSettings.setCodec("audio/mp3");
     // audioSettings.setQuality(QMultimedia::HighQuality);
@@ -52,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mediaRecorder->setAudioSettings(audioSettings);
 
     camera->setCaptureMode(QCamera::CaptureVideo);
-    camera->start();//8
+    camera->start();
 
     connect(ui->recordButton, SIGNAL(toggled(bool)), this, SLOT(recordButton_toggled(bool)));
 }
@@ -66,8 +72,20 @@ void MainWindow::recordButton_toggled(bool checked)
 {
     if ( checked ) {
         ui->stackedWidget->setCurrentIndex(cameraFinderPos);
-        QString fileName = QString("C:/dev/xxx-") + QDateTime::currentDateTime().toString("dd.MM.yy-h-m-s") + ".avi";
-        qDebug() << QUrl::fromLocalFile(fileName);
+
+        QDir appDir = qApp->applicationDirPath();
+
+#ifdef Q_OS_MAC
+        appDir.cdUp();
+        appDir.cdUp();
+        appDir.cdUp();
+#endif
+
+        QString fileName = appDir.absolutePath() + QString("/xxx-") + QDateTime::currentDateTime().toString("dd.MM.yy-h-m-s");
+
+        qDebug() << fileName;
+
+
         mediaRecorder->setOutputLocation(fileName);
         mediaRecorder->record();
         ui->recordButton->setText(QString("Recording is ON"));
