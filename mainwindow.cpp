@@ -93,6 +93,11 @@ void MainWindow::recordButton_toggled(bool checked)
         mediaRecorder->setOutputLocation(fileName);
         mediaRecorder->record();
         ui->recordButton->setText(QString("Recording is ON"));
+
+        qDebug() << mediaRecorder->state();
+        qDebug() << mediaRecorder->status();
+        qDebug() << mediaRecorder->error();
+
     } else {
         ui->stackedWidget->setCurrentIndex(cameraFinderPos);
         mediaRecorder->stop();
