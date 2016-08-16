@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     foreach (const QCameraInfo &cameraInfo, cameras) {
-           qDebug() << cameraInfo.deviceName();
+           qDebug() << cameraInfo.description();
     }
 
     // return;
@@ -42,20 +42,24 @@ MainWindow::MainWindow(QWidget *parent) :
     mediaRecorder = new QMediaRecorder(camera,this);
 
     QVideoEncoderSettings videoSettings = mediaRecorder->videoSettings();
-    // videoSettings.setResolution(640, 480);
-    // videoSettings.setQuality(QMultimedia::VeryHighQuality);
+     videoSettings.setResolution(640, 480);
+     videoSettings.setQuality(QMultimedia::VeryHighQuality);
     mediaRecorder->setVideoSettings(videoSettings);
 
-    qDebug() << "Codec: " + videoSettings.codec();
-    qDebug() << "bitRate: " + QString( videoSettings.bitRate() );
-    qDebug() << "encodingMode: " + QString( videoSettings.encodingMode() );
-    // qDebug() << "encodingOptions: " + videoSettings.encodingOptions();
+    QVariantMap opts = videoSettings.encodingOptions();
+    foreach ( QString key, opts.keys() ) {
+        qDebug() << key << ": " << opts[key];
+
+    }
 
     QAudioEncoderSettings audioSettings = mediaRecorder->audioSettings();
-    // audioSettings.setCodec("audio/mp3");
-    // audioSettings.setQuality(QMultimedia::HighQuality);
+     audioSettings.setCodec("audio/mp3");
+     audioSettings.setQuality(QMultimedia::HighQuality);
 
     mediaRecorder->setAudioSettings(audioSettings);
+
+    qDebug() << "Supported audio codecs: " << mediaRecorder->supportedAudioCodecs();
+    qDebug() << "Supported video codecs: " <<  mediaRecorder->supportedVideoCodecs();
 
     camera->setCaptureMode(QCamera::CaptureVideo);
     camera->start();
@@ -81,7 +85,7 @@ void MainWindow::recordButton_toggled(bool checked)
         appDir.cdUp();
 #endif
 
-        QString fileName = appDir.absolutePath() + QString("/xxx-") + QDateTime::currentDateTime().toString("dd.MM.yy-h-m-s");
+        QString fileName = appDir.absolutePath() + QString("/xxx-") + QDateTime::currentDateTime().toString("dd.MM.yy-h-m-s") + QString(".avi");
 
         qDebug() << fileName;
 
